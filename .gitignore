@@ -1,0 +1,12 @@
+# Ignore IntelliJ project directory
+.idea
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# Ignore generated sdl java bindings, but keep the package they are generated in
+!sdl-bindings/**/org/libsdl/sdl/
+sdl-bindings/**/org/libsdl/sdl/**
