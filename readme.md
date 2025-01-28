@@ -34,3 +34,25 @@ I'll let you know once there's an 'it' that works.
 4) Spend less time making :kissing: faces at gradle to create build tasks related to `cmake` in `sdl-native`
     - there's a lot to say here too, especially since there's the possibility of leveraging gradle's
       `cpp-application` and/or `cpp-library` plugins rather than invoking `cmake` directly in `Exec` tasks
+    - also had a surprisingly amount of difficulty setting up a gradle task to copy the sdl library file
+      out of `./sdl-native/build/[Debug|Release]/SDL3.dll` into `./jsdl3-app` so that it would be available
+      to be loaded from the current working directory when running the app, so I just did it manually for now
+5) With most of the pieces in place, I started adding more bits to the example app in `./jsdl3-app`
+    - unexpectedly, there are some subtleties of working with the generated bindings that I'm figuring out as I go
+    - seems like all functions can be called through `SDL_h.*`, even those that are in the `SDL_h_#.java` files
+    - allocating data / structs that are used across the jvm / native boundary is done via an `Arena`,
+      and the example app is currently setup with a single 'confined' arena for all SDL data,
+      I plan to make some other arenas for different scopes, starting with a per-frame arena for allocating
+      the `SDL_Event` used in the event handling loop
+    - many structs like `SDL_FPoint, SDL_FRect` provide `allocate(arena)` and `allocateArray(arena, count)`
+      methods for simple creation, though it doesn't look like there's a `free()` that I've found so far,
+      likely because deallocation is handled automatically when the allocating `Arena` goes out of scope
+    - some structs/types like `SDL_Window, SDL_Renderer` aren't structs in the sense of having fields
+      that can be read/written, but rather they are opaque handles, so working with them involves
+      allocating the memory, passing it into some SDL function to instantiate the underlying object,
+      then getting the native pointer from the allocated memory for use in other methods that reference it
+        - :thinking: I'm not certain that last piece is technically necessary, but I haven't tested it yet
+    - for native structs with fields we need to use, the jextract generated interface provides nice
+      getters and setters for the fields in a java `record` sort of style
+    - for arrays of native structs, we need to use `{Type}.asSlice(arr, index)` to get a pointer to
+      a single element, and then we can use the standard methods to interact with the element
