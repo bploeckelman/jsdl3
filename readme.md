@@ -30,3 +30,7 @@ I'll let you know once there's an 'it' that works.
 3) Spend lots of time making :kissing: faces at gradle to create build tasks related to `jextract` in `sdl-bindings`
     - there's a lot to say about this piece, because figuring out how to use gradle is maddening
       and I learned a bunch from this process but didn't write it out as I went so that I didn't lose my mind
+    - :pushpin: rework the `unpack` task to use the built-in `Tar` task type in gradle instead of `Exec`
+4) Spend less time making :kissing: faces at gradle to create build tasks related to `cmake` in `sdl-native`
+    - there's a lot to say here too, especially since there's the possibility of leveraging gradle's
+      `cpp-application` and/or `cpp-library` plugins rather than invoking `cmake` directly in `Exec` tasks

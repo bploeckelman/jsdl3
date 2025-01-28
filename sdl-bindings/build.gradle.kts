@@ -50,7 +50,6 @@ tasks {
     val unpack by registering(JextractUnpackTask::class) {
         group = "sdl-bindings"
         description = "Unpacks jextract archive file downloaded by 'downloadJextract' task"
-
         dependsOn(download)
 
         val tarExecutable = resolveExecutable(Binaries.tar)
@@ -63,19 +62,10 @@ tasks {
     val bindings by registering(JextractGenerateBindings::class) {
         group = "sdl-bindings"
         description = "Generate Java bindings for SDL using jextract unpacked back 'unpackJextract' task"
-
         dependsOn(unpack)
 
         baseDir.set(layout.projectDirectory.dir(".."))
         jextractBaseDir.set(jextractDefaultDir)
-    }
-
-    named("build") {
-        dependsOn(download, unpack)
-    }
-
-    named("compileJava") {
-        dependsOn(bindings)
     }
 }
 
