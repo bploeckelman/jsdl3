@@ -8,4 +8,7 @@ dependencies {
 
 application {
     mainClass = "net.bplo.jsdl3.App"
+    applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=ALL-UNNAMED"
+    )
 }

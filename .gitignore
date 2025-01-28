@@ -10,3 +10,8 @@ build
 # Ignore generated sdl java bindings, but keep the package they are generated in
 !sdl-bindings/**/org/libsdl/sdl/
 sdl-bindings/**/org/libsdl/sdl/**
+
+# Ignore sdl library files copied to the project root
+*.so
+*.dylib
+*.dll
