@@ -13,6 +13,65 @@ I'll let you know once there's an 'it' that works.
 
 ### Setup
 
+Clone this repo with `git clone --recurse-submodules https://github.com/bploeckelman/jsdl3.git` to
+automatically pull the SDL submodule code under `./sdl-native/src/main/cpp`. If you've already cloned
+without the `--recurse-submodules` flag, from the project root run: `git submodule update --init --recursive`.
+
+There are a couple prerequisites for running the example application in `./jsdl3-app`:
+
+- Download and unpack the [jextract pre-built binaries for your platform](https://jdk.java.net/jextract/)
+- Download and install [cmake binaries for your platform](https://cmake.org/download/),
+  or find them from an existing IDE installation, Visual Studio, CLion, etc...
+
+Run the following commands to get everything setup:
+
+```shell
+cd /path/to/jsdl3
+
+# Generate SDL java bindings in `./sdl-bindings/src/main/java` by running jextract:
+# - which of [jextract, jextract.ps1, jextract.bat] to run depends on your platform, this assumes windows in powershell
+/path/to/jextract/jextract.ps1 --library SDL3     `
+  --target-package org.libsdl.sdl                 `
+  --include-dir ./sdl-native/src/main/cpp/include `
+  --output      ./sdl-bindings/src/main/java      `
+  SDL3/SDL3.h
+  
+# Configure SDL build scripts by running cmake:
+/path/to/cmake.exe `
+  -S ./sdl-native/src/main/cpp `
+  -B ./sdl-native/build/sdl
+
+# Build SDL shared library by running cmake:
+/path/to/cmake.exe --build ./sdl-native/build/sdl --parallel
+```
+
+There are several gradle tasks in this project that attempt to simplify the setup steps by downloading,
+unpacking, and running the `jextract` command to generate bindings, and running `cmake` commands to
+configure and build the SDL shared library. You can try running those to start with, but it assumes
+that at least `cmake` is installed and available to invoke from your `PATH`.
+
+```shell
+cd /path/to/jsdl3
+
+# Run the gradle tasks to generate bindings and build the sdl shared library
+./gradlew sdl-bindings:bindings sdl-native:libsdl
+
+# If that worked you should have:
+# - many java files in ./sdl-bindings/src/main/java/org/libsdl/sdl
+# - a shared library under ./sdl-native/build/sdl with some differences depending on your platform
+#   - if on windows, check under Debug/ or Release/ for an SDL3.dll
+#   - otherwise look for a libSDL3.so or libSDL3.dylib for linux and macos respectively
+
+# Copy the shared library from the build folder into the ./jsdl3-app root,
+# assuming you're on windows with a debug build, this would be:
+cp ./sdl-native/build/Debug/SDL3.dll ./jsdl3-app
+
+# Launch the example app:
+./gradlew jsdl3-app:run
+```
+
+### Project Setup Process
+
 1) Created this repo as a multi-module gradle project by running `gradle init` in an empty root folder
     - added a root `build.gradle.kts` file since it wasn't included by default
     - modified `settings.gradle.kts` for the following gradle module name changes:
